@@ -1,0 +1,2 @@
+﻿  Source.c
+C:\Users\myles\OneDrive - AUT University\Year Three\Sem 1\COMP612\Project1\Project1\Source.c(11,10): fatal  error C1083: Cannot open include file: 'freeglut.h': No such file or directory
