@@ -1,6 +1,4 @@
 ﻿  Source.c
-C:\Users\myles\OneDrive - AUT University\Year Three\Sem 1\COMP612\Project1\Rainbow Line\Source.c(19,25): warning C4244: 'function': conversion from 'double' to 'int', possible loss of data
-C:\Users\myles\OneDrive - AUT University\Year Three\Sem 1\COMP612\Project1\Rainbow Line\Source.c(19,29): warning C4244: 'function': conversion from 'double' to 'int', possible loss of data
   Rainbow Line.vcxproj -> C:\Users\myles\OneDrive - AUT University\Year Three\Sem 1\COMP612\Project1\Debug\Rainbow Line.exe
   C:\Users\myles\OneDrive - AUT University\Year Three\Sem 1\COMP612\Project1\Rainbow Line\freeglut\bin\freeglut.dll
   1 File(s) copied
