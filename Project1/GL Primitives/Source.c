@@ -10,14 +10,15 @@ void initializeGL(void)
 	glLoadIdentity();
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
-	gluOrtho2D(0.0, 600.0, 0.0, 600.0);
+	glLineWidth(10);
+	gluOrtho2D(0.0, 600.0, 0.0, 800.0);
 }
 
 void main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGB);
-	glutInitWindowSize(600, 600);
+	glutInitDisplayMode(GLUT_RGBA);
+	glutInitWindowSize(600, 800);
 	glutInitWindowPosition(250, 250);
 	glutCreateWindow("Primitives");
 	glutDisplayFunc(drawShapes);
@@ -28,6 +29,8 @@ void main(int argc, char** argv)
 void drawShapes(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
+	glRasterPos2i(175, 500);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_10, "GL_TRIANGLES");
 	glBegin(GL_TRIANGLES);
 	glVertex2i(175, 500);
 	glVertex2i(150, 590);
@@ -55,8 +58,11 @@ void drawShapes(void)
 	glVertex2i(240, 420);
 	glEnd();
 
+	glColor3f(1, 1, 1);
+	glRasterPos2i(400, 560);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_10, "GL_TRIANGLE_STRIP");
 	glBegin(GL_TRIANGLE_STRIP);
-	glColor4f(0, 0, 255, 0.1);
+	glColor4f(0.0f, 0.0f, 255, 0.1f);
 	glVertex2i(400, 550);//1
 	glColor4f(0, 0, 255, 0.2);
 	glVertex2i(550, 550);//2
@@ -78,6 +84,10 @@ void drawShapes(void)
 	glVertex2i(490, 350);//10
 	glEnd();
 
+
+	glColor3f(1, 1, 1);
+	glRasterPos2i(160, 310);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_10, "GL_TRIANGLE_FAN");
 	glBegin(GL_TRIANGLE_FAN);
 	glColor4f(50, 255, 0, 0.1);
 	glVertex2i(50, 250);//1
@@ -107,6 +117,9 @@ void drawShapes(void)
 	glVertex2i(260, 250);//13
 	glEnd();
 
+	glColor3f(1, 1, 1);
+	glRasterPos2i(160, 200);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_10, "GL_POLYGON");
 	glBegin(GL_POLYGON);
 	glColor3f(1, 0, 0);
 	glVertex2i(150, 200);//1
@@ -122,6 +135,9 @@ void drawShapes(void)
 	glVertex2i(100, 150);//6
 	glEnd();
 
+	glColor3f(1, 1, 1);
+	glRasterPos2i(460, 300);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_10, "GL_TRIANGLE_STRIP");
 	glBegin(GL_TRIANGLE_STRIP);
 	glColor3f(1, 1, 0);
 	glVertex2i(450,300);
@@ -137,8 +153,15 @@ void drawShapes(void)
 	glVertex2i(550,100);
 	glEnd();
 
-
-
+	glColor3f(1, 1, 1);
+	glRasterPos2i(290, 710);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_10, "GL_LINES");
+	glBegin(GL_LINES);
+	glColor4f(1, 0, 0, 1);
+	glVertex2i(100, 700);
+	glColor4f(1, 0, 0, 0);
+	glVertex2i(550, 700);
+	glEnd();
 	glFlush();
 }
 
