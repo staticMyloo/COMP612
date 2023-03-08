@@ -60,7 +60,7 @@ void drawSquare()
 	glBegin(GL_POLYGON);
 	glColor4f(1.0f, 1.0f, 1.0f,0.1f);
 	glVertex2i(0,500);
-	glVertex2i(250,500);
+	glVertex2i(250,500000);
 	glVertex2i(250,250);
 	glVertex2i(0,250);
 	glEnd();
@@ -77,7 +77,7 @@ void drawCircle(CircleXY c)
 
 	float y = 0;
 	glLineWidth(2);
-	glBegin(GL_TRIANGLE_FAN);
+	glBegin(GL_LINE_LOOP);
 	for (int ii = 0; ii < c.radius; ii++)
 	{
 		glVertex2f(x + c.cx, y + c.cy);//output vertex 

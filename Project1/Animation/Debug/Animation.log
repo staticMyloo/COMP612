@@ -1,0 +1,8 @@
+﻿  Source.c
+C:\Users\myles\OneDrive - AUT University\Year Three\Sem 1\COMP612\Project1\Animation\Source.c(289,24): warning C4305: '+=': truncation from 'double' to 'float'
+C:\Users\myles\OneDrive - AUT University\Year Three\Sem 1\COMP612\Project1\Animation\Source.c(316,88): warning C4244: 'function': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\myles\OneDrive - AUT University\Year Three\Sem 1\COMP612\Project1\Animation\Source.c(317,48): warning C4244: 'function': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\myles\OneDrive - AUT University\Year Three\Sem 1\COMP612\Project1\Animation\Source.c(317,92): warning C4244: 'function': conversion from 'double' to 'GLfloat', possible loss of data
+  Animation.vcxproj -> C:\Users\myles\OneDrive - AUT University\Year Three\Sem 1\COMP612\Project1\Debug\Animation.exe
+  C:\Users\myles\OneDrive - AUT University\Year Three\Sem 1\COMP612\Project1\Animation\freeglut\bin\freeglut.dll
+  1 File(s) copied
