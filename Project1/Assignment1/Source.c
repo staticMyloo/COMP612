@@ -9,6 +9,8 @@
 #include <freeglut.h>
 #include <math.h>
 #include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
  /******************************************************************************
   * Animation & Timing Setup
   ******************************************************************************/
@@ -17,6 +19,8 @@
 #define TRUE 1
 #define FALSE 0
 #define PI 3.141592653589793238
+#define MAX_PARTICLES 1000
+
 
 
 
@@ -36,22 +40,39 @@ unsigned int frameStartTime = 0;
  // Note: USE ONLY LOWERCASE CHARACTERS HERE. The keyboard handler provided converts all
 // characters typed by the user to lowercase, so the SHIFT key is ignored.
 #define KEY_EXIT 27 // Escape key.
+#define SNOW_TOGGLE 115 //'S' key 
 /******************************************************************************
  * GLUT Callback Prototypes
  ******************************************************************************/
 
-typedef struct {
+typedef struct Color {
 	float r;
 	float g;
 	float b;
 	float alpha;
 }Color;
 
-typedef struct {
+typedef struct Circle {
 	float cx;
 	float cy;
 	float radius;
 }Circle;
+
+typedef struct Position2xy {
+	float x;
+	float y;
+}Position2xy;
+
+typedef struct Particle_t {
+	Position2xy pos;
+	float size;
+	float dy;
+	int timer;
+	int active;
+	Color color;
+}Particle_t;
+
+int snowFall = FALSE;
 
 void display(void);
 void reshape(int width, int h);
@@ -61,6 +82,11 @@ void drawCircle(Circle c, Color color, int isClear);
 void drawBase(void);
 void drawBackGround(void);
 void drawFace(Circle c);
+void spawnParticle(Particle_t *p, Position2xy pos);
+void initiliazeParticles(Particle_t p[]);
+void spawnParticles(void);
+void drawDiagnostics(void);
+void printString(char* text, int value, float x, float y);
 /******************************************************************************
  * Animation-Specific Function Prototypes (add your own here)
  ******************************************************************************/
@@ -70,19 +96,26 @@ void think(void);
 /******************************************************************************
  * Animation-Specific Setup (Add your own definitions, constants, and globals here)
  ******************************************************************************/
-
+Particle_t particleSystem[MAX_PARTICLES];
 Circle globeCircle = { 0.0f, 0.0f, 1 };
 Circle c1 = { -0.3f, -0.61f, 0.1f };
 Circle c2 = { -0.3f, -0.5f, 0.075f };
 Circle c3 = { -0.3f, -0.45f, 0.06f };//Circle responsible for head
 const float windowWidth = 800.0f;
 const float windowHeight = 800.0f;
+double timeSpent = 0.0;
+clock_t begin;
+
+float range[] = { -1.0f, 1.0f };
+float fallRange[] = { 0.0002f,0.0025f };
+int totalParticles = 0;
 
  /******************************************************************************
   * Entry Point (don't put anything except the main function here)
   ******************************************************************************/
 void main(int argc, char** argv)
 {
+	srand((unsigned int)time(0));
 	// Initialize the OpenGL window.
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
@@ -95,7 +128,7 @@ void main(int argc, char** argv)
 	// Register GLUT callbacks.
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
-	glutKeyboardFunc(keyPressed);
+	glutKeyboardFunc(&keyPressed);
 	glutIdleFunc(idle);
 	// Record when we started rendering the very first frame (which should happen after we call glutMainLoop).
 	frameStartTime = (unsigned int)glutGet(GLUT_ELAPSED_TIME);
@@ -124,15 +157,17 @@ void display(void)
 	Function Prototypes" section near the top of this template.
 	*/
 	drawBackGround();
-	Color globeColor = { 1,1,1, 0.5f };
-	drawCircle(globeCircle, globeColor, TRUE);
-	drawBase();
+	//Color globeColor = { 1,1,1, 0.5f };
+	//drawCircle(globeCircle, globeColor, TRUE);
+	//drawBase();
 	Color snowManColor = { 124.0f, 229.0f, 252.0f, 0.8f };
 	drawCircle(c1, snowManColor, FALSE);
-	drawCircle(c2, snowManColor, FALSE);
+    drawCircle(c2, snowManColor, FALSE);
 	drawCircle(c3, snowManColor, FALSE);
 	drawFace(c3);
-
+;
+	spawnParticles();
+	drawDiagnostics();
 	glutSwapBuffers();
 }
 /*
@@ -155,6 +190,10 @@ void keyPressed(unsigned char key, int x, int y)
 		definition in the "Keyboard Input Handling Setup" section of this
 		file.
 		*/
+	case SNOW_TOGGLE:
+		snowFall = !snowFall;
+		printf("snow is %s", snowFall ? "on\n" : "off\n");
+		break;
 	case KEY_EXIT:
 		exit(0);
 		break;
@@ -205,6 +244,7 @@ void init(void)
 	glLoadIdentity();
 	// set window mode to 2D orthographica and set the window size 
 	gluOrtho2D(-1.0, 1.0, -1.0, 1.0);
+	initiliazeParticles(particleSystem);
 }
 /*
 Advance our animation by FRAME_TIME milliseconds.
@@ -260,11 +300,54 @@ void think(void)
 	opacity,
 	brightness of lights, etc.
 	*/
+	timeSpent = (double)(clock() - begin) / CLOCKS_PER_SEC;
+
+	for (int i = 0; i < MAX_PARTICLES; i++)
+	{
+		//if snowfall is on, trigger snow to fall
+		//if the trigger is on and the particle timer is triggered, turn active on
+		//if the snow is active, and snowfall is off, keep falling snow
+		//if the snow hits the bottom, reset position
+		//if the snow resets and snowfall is false, randomise timer
+
+		Particle_t *snow = &particleSystem[i];
+
+		if (!snowFall)
+		{
+			if (snow->active)
+			{
+				snow->pos.y -= snow->dy;
+			}
+		}
+		else if (snowFall)
+		{
+			if (snow->timer > timeSpent)
+			{
+				snow->active = TRUE;
+			}
+
+			if (snow->active)
+			{
+				snow->pos.y -= snow->dy;
+			}
+		}
+
+		if (snow->pos.y < -1.0f)
+		{
+			snow->timer = (rand() % 10) + 1;
+			snow->pos.x = ((range[1] - range[0]) * ((float)rand() / RAND_MAX)) + range[0];
+			snow->pos.y = 1.2f;
+			if (!snowFall)
+			{
+				snow->active = FALSE;
+			}
+		}
+	}
 }
 
 void drawCircle(Circle c, Color color, int isClear)
 {
-	float alphaValue = isClear ? 0.5 : 1;
+	float alphaValue = isClear ? color.alpha : 1;
 	glColor4f(color.r, color.g, color.b, alphaValue);
 	glBegin(GL_TRIANGLE_FAN);
 	glVertex2f(c.cx, c.cy);
@@ -292,15 +375,58 @@ void drawBase(void)
 	glEnd();
 }
 
+void drawDiagnostics(void)
+{
+	glColor3f(0, 0, 0);
+	glBegin(GL_QUADS);
+	glVertex2f(-0.5f, 0.5f);
+	glVertex2f(-0.5f, 1.0f);
+	glVertex2f(-1.0f, 1.0f);
+	glVertex2f(-1.0f, 0.5f);
+	glEnd();
+	glColor3f(1, 1, 1);
+}
+
+void printString(char *text, int value, float x, float y)
+{
+	char temp[100];
+	snprintf(temp, 100, "%s: %d", text, value);
+	glColor3f(1, 1, 1);
+	glRasterPos2f(x,y);
+	printf("%s", temp);
+	for (int i = 0; i < strlen(temp); i++) {
+		glutBitmapCharacter(GLUT_BITMAP_8_BY_13, temp[i]);
+	}
+	
+}
+
 void drawBackGround(void)
 {
 	glBegin(GL_POLYGON);
-	glColor3f(0.5, 0.5, 0.5);
+	glColor3f(0.8f, 1, 1);
 	glVertex2f(1.0f, -1.0f);
+	glColor3f(0, 0.3f, 1);
 	glVertex2f(1.0f, 1.0f);
 	glVertex2f(-1.0f, 1.0f);
+	glColor3f(0.8f, 1, 1);
 	glVertex2f(-1.0f, -1.0f);
 	glEnd();
+
+	//glBegin(GL_TRIANGLE_FAN);
+	//glColor3f(115.0f/255.0f, 85.0f/255.0f, 2.0f/255.0f);
+	//glVertex2f(-1.0f, -1.0f);//1
+	//glVertex2f(-0.8f, 0.4f);//2
+	//glVertex2f(-0.6f, -0.4f);//3
+	//glVertex2f(-0.3f, -0.2f);//4
+	//glVertex2f(-0.2f, -0.4f);//5
+	//glVertex2f(-0.1f, 0.1f);//6
+	//glVertex2f(0.2f, -0.3f);//7
+	//glVertex2f(0.25f, 0);//8
+	//glVertex2f(0.7f, -0.3f);//9
+	//glVertex2f(0.9f, -0.2f);//10
+	//glVertex2f(1.0f, -1.0f);//11
+	//glEnd();
+
 }
 
 void drawFace(Circle c)
@@ -312,5 +438,44 @@ void drawFace(Circle c)
 	glVertex2f(c3.cx + 0.05f, c3.cy+0.025f);
 	glEnd();
 }
+
+void spawnParticle(Particle_t* p, Position2xy pos)
+{
+	glPointSize(p->size);
+	glColor4f(p->color.r, p->color.g, p->color.b, p->color.alpha);
+	glBegin(GL_POINTS);
+	glVertex2f(pos.x, pos.y);
+	glEnd();
+}
+
+void spawnParticles(void)
+{
+	for (int i = 0; i < MAX_PARTICLES; i++)
+	{
+		Particle_t* snow = &particleSystem[i];
+		spawnParticle(snow,snow->pos);
+	}
+}
+
+void initiliazeParticles(Particle_t p[])
+{
+	for (int i = 0; i < MAX_PARTICLES; i++)
+	{
+		Position2xy startingPos = { ((range[1] - range[0])* ((float)rand() / RAND_MAX)) + range[0], (1.2f)};
+		p[i].pos = startingPos;
+		p[i].size = (float)(rand() % 3) + 1;
+		p[i].dy = ((fallRange[1] - fallRange[0]) * ((float)rand() / RAND_MAX)) + fallRange[0];
+		//p[i].dy = (float)p[i].size / 1000.0f;
+		p[i].active = FALSE;
+		p[i].timer = (rand() % 10) + i / 10;
+		p[i].color.alpha = ((range[1] - range[0]) * ((float)rand() / RAND_MAX)) + range[0];
+		p[i].color.r = 1;
+		p[i].color.g = 1;
+		p[i].color.b = 1;
+
+
+	}
+}
+
 
 /******************************************************************************/

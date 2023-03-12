@@ -1,5 +1,5 @@
 ﻿  Source.c
-C:\Users\myles\OneDrive - AUT University\Year Three\Sem 1\COMP612\Project1\Assignment1\Source.c(267,29): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\myles\OneDrive - AUT University\Year Three\Sem 1\COMP612\Project1\Assignment1\Source.c(397,20): warning C4018: '<': signed/unsigned mismatch
   Assignment1.vcxproj -> C:\Users\myles\OneDrive - AUT University\Year Three\Sem 1\COMP612\Project1\Debug\Assignment1.exe
   C:\Users\myles\OneDrive - AUT University\Year Three\Sem 1\COMP612\Project1\Assignment1\freeglut\bin\freeglut.dll
   1 File(s) copied
